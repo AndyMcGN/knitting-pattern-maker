@@ -1,4 +1,4 @@
-import { Dispatch, FunctionComponent, SetStateAction } from 'react';
+import { Dispatch, FunctionComponent, SetStateAction, useState } from 'react';
 
 interface AddRowInputProps {
   pattern: Pattern;
@@ -18,6 +18,7 @@ const AddRowInput: FunctionComponent<AddRowInputProps> = (props: AddRowInputProp
     gridSize: { width: gridWidth },
     setGridSize,
   } = props;
+  const [numberOfSameRows, setNumberOfSameRows] = useState<number>(3);
 
   function addRow(numberOfStitches: number) {
     if (numberOfStitches === 0) return;
@@ -36,6 +37,11 @@ const AddRowInput: FunctionComponent<AddRowInputProps> = (props: AddRowInputProp
     console.log({ gridWidth, startColumn, endColumn, middleColumn });
 
     updatePattern(startColumn, endColumn, correctGridWidth);
+  }
+  function addManyRows(numberOfStitches: number, numberOfRows: number) {
+    for (let i = 0; i < numberOfRows; i++) {
+      addRow(numberOfStitches);
+    }
   }
 
   function updatePattern(startColumn: number, endColumn: number, updatedGridLength: number) {
@@ -63,18 +69,30 @@ const AddRowInput: FunctionComponent<AddRowInputProps> = (props: AddRowInputProp
       </>
       <button
         onClick={() => {
-          console.log(currentNumberOfStitches);
           addRow(currentNumberOfStitches);
         }}
       >
         {pattern.rows.length === 0 ? 'Create first row' : 'Add same length row'}
       </button>
+
+      <div>
+        <span>Create</span>
+        <input
+          type="number"
+          value={numberOfSameRows}
+          onChange={(val) => setNumberOfSameRows(Number(val.target.value))}
+        ></input>
+        <span> identical rows with {currentNumberOfStitches} stitches</span>
+        <button
+          onClick={() => {
+            addManyRows(currentNumberOfStitches, numberOfSameRows);
+          }}
+        >
+          Add rows
+        </button>
+      </div>
     </div>
   );
 };
 
 export default AddRowInput;
-function isEven(n: number) {
-  n = Number(n);
-  return n === 0 || !!(n && !(n % 2));
-}
