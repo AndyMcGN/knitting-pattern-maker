@@ -6,6 +6,7 @@ interface AddRowInputProps {
   currentNumberOfStitches: number;
   setCurrentNumberOfStitches: Dispatch<SetStateAction<number>>;
   gridSize: GridSize;
+  setGridSize: Dispatch<SetStateAction<GridSize>>;
 }
 
 const AddRowInput: FunctionComponent<AddRowInputProps> = (props: AddRowInputProps) => {
@@ -14,38 +15,31 @@ const AddRowInput: FunctionComponent<AddRowInputProps> = (props: AddRowInputProp
     currentNumberOfStitches,
     setCurrentNumberOfStitches,
     setPattern,
-    gridSize: { width: gridWidth, height: gridHeight },
+    gridSize: { width: gridWidth },
+    setGridSize,
   } = props;
 
   function addRow(numberOfStitches: number) {
     if (numberOfStitches === 0) return;
+    // Have a few empty stitches outside pattern.
+    let correctGridWidth = gridWidth;
+    if (numberOfStitches + 8 > gridWidth) {
+      correctGridWidth = numberOfStitches + 8;
 
-    const middleColumn: number = Math.floor((gridWidth + 1) / 2);
+      setGridSize((prevGridSize) => ({ ...prevGridSize, width: correctGridWidth }));
+    }
+    const middleColumn: number = Math.floor((correctGridWidth + 1) / 2);
     const startColumn: number = middleColumn - Math.floor(numberOfStitches / 2);
-    // if (startColumn < 0) {
-    //   const extraSquaresNeeded = Math.abs(startColumn) + 4;
-    //   const patternWithExtraRows = pattern.rows.map((row) => {
-    //     for (let i = 0; i < extraSquaresNeeded; i++) {
-    //       row.unshift(false);
-    //       row.push(false);
-    //       return row;
-    //     }
-    //   });
-    //   setPattern((prevPattern) => ({
-    //     ...prevPattern,
-    //     rows: (patternWithExtraRows as boolean[][])
-    //   }));
-    // }
 
     // If numberOfStitches is odd, choose the right middle column
     const endColumn: number = startColumn + numberOfStitches - 1;
     console.log({ gridWidth, startColumn, endColumn, middleColumn });
 
-    updatePattern(startColumn, endColumn);
+    updatePattern(startColumn, endColumn, correctGridWidth);
   }
 
-  function updatePattern(startColumn: number, endColumn: number) {
-    const newRow = Array(gridWidth).fill(false);
+  function updatePattern(startColumn: number, endColumn: number, updatedGridLength: number) {
+    const newRow = Array(updatedGridLength).fill(false);
     for (let i = startColumn; i <= endColumn; i++) {
       newRow[i - 1] = true;
     }
@@ -56,19 +50,17 @@ const AddRowInput: FunctionComponent<AddRowInputProps> = (props: AddRowInputProp
     }));
     console.log(pattern);
   }
+
   return (
     <div>
-      {pattern.rows.length === 0 && (
-        <>
-          <p>How many stitches to start with?</p>
-          <input
-            type="number"
-            value={currentNumberOfStitches}
-            onChange={(val) => setCurrentNumberOfStitches(Number(val.target.value))}
-            max={100}
-          />
-        </>
-      )}
+      <>
+        <p>How many stitches to start with?</p>
+        <input
+          type="number"
+          value={currentNumberOfStitches}
+          onChange={(val) => setCurrentNumberOfStitches(Number(val.target.value))}
+        />
+      </>
       <button
         onClick={() => {
           console.log(currentNumberOfStitches);
@@ -82,3 +74,7 @@ const AddRowInput: FunctionComponent<AddRowInputProps> = (props: AddRowInputProp
 };
 
 export default AddRowInput;
+function isEven(n: number) {
+  n = Number(n);
+  return n === 0 || !!(n && !(n % 2));
+}

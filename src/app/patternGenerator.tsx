@@ -1,8 +1,8 @@
 interface Pattern {
-    rows: boolean[][]
+  rows: boolean[][];
 }
 
 interface GridSize {
-    height: number;
-    width: number;
+  height: number;
+  width: number;
 }

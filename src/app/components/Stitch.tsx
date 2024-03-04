@@ -6,8 +6,8 @@ interface StitchProps {
 }
 
 const StyledStitch = styled.div<{ $isKnit: boolean }>`
-  height: 20px;
-  width: 20px;
+  height: 10px;
+  width: 10px;
   background-color: ${(props) => (props.$isKnit ? 'blue' : 'white')};
   border: solid 1px black;
   display: inline-block;

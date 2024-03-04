@@ -1,10 +1,11 @@
-import { FunctionComponent, Key, useEffect } from 'react';
+import { Dispatch, FunctionComponent, Key, SetStateAction, useEffect } from 'react';
 import styled from 'styled-components';
 import Stitch from './Stitch';
 
 interface PatternDisplayProps {
   pattern: Pattern;
   gridSize: GridSize;
+  setPattern: Dispatch<SetStateAction<Pattern>>;
 }
 const StyledPatternDisplay = styled.div`
   padding: 3rem 0;
@@ -16,13 +17,13 @@ const StyledPatternDisplay = styled.div`
 `;
 
 const PatternDisplay: FunctionComponent<PatternDisplayProps> = (props) => {
-  const { pattern, gridSize } = props;
+  const { pattern, setPattern, gridSize } = props;
   return (
     <StyledPatternDisplay>
       {/* {pattern.rows.map((row: boolean[], index: Key | null | undefined) => (
         <Row key={index} row={row} />
       ))} */}
-      <Grid gridSize={gridSize} pattern={pattern} />
+      <Grid gridSize={gridSize} pattern={pattern} setPattern={setPattern} />
     </StyledPatternDisplay>
   );
 };
@@ -30,6 +31,7 @@ const PatternDisplay: FunctionComponent<PatternDisplayProps> = (props) => {
 interface GridProps {
   gridSize: GridSize;
   pattern: Pattern;
+  setPattern: Dispatch<SetStateAction<Pattern>>;
 }
 const StyledRow = styled.div<{ $index: number }>`
   font-size: 0;
@@ -57,7 +59,23 @@ export const Grid: FunctionComponent<GridProps> = (props: GridProps) => {
   const {
     gridSize: { width, height },
     pattern,
+    setPattern,
   } = props;
+
+  useEffect(() => {
+    const patternWithExtraStitches = pattern;
+    for (const row of patternWithExtraStitches.rows) {
+      if (row.length < width) {
+        const extraStitchesOnEachEnd = Math.floor((props.gridSize.width - row.length) / 2);
+        for (let i = 0; i < extraStitchesOnEachEnd; i++) {
+          row.unshift(false);
+          row.push(false);
+        }
+      }
+    }
+    setPattern(() => patternWithExtraStitches);
+  }, [props.gridSize, pattern, width, setPattern]);
+
   console.log(pattern);
   return (
     <StyledGrid>
