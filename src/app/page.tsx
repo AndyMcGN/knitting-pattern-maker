@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import PatternDisplay from './components/PatternDisplay';
-import AddRowInput from './components/form/AddRowInput';
 import IncreaseOrDecreaseInput from './components/form/IncreaseOrDecreaseInput';
+import InputsContainer from './components/form/EditPatternInputsContainer';
 
 export default function Home() {
   const [pattern, setPattern] = useState<Pattern>({ rows: [] });
@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <>
       {/* <GridSizeInput setGridSize={setGridSize} gridSize={gridSize} /> */}
-      <AddRowInput
+      <InputsContainer
         gridSize={gridSize}
         setGridSize={setGridSize}
         pattern={pattern}
