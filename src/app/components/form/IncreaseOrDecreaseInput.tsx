@@ -14,7 +14,7 @@ interface IncreaseOrDecreaseInputProps {
   currentNumberOfStitches: number;
   changeAtBeginningOrEnd: StitchChangePlace;
   setChangeAtBeginningOrEnd: Dispatch<SetStateAction<StitchChangePlace>>;
-  addDifferentRow: Function;
+  addRowWithIncreaseOrDecrease: (changes: { changesLeft: number; changesRight: number }) => void;
 }
 const StyledButton = styled.button`
   border-radius: 50%;
@@ -51,9 +51,20 @@ const IncreaseOrDecreaseInput: FunctionComponent<IncreaseOrDecreaseInputProps> =
     numberStitchesToChange,
     setNumberStitchesToChange,
     setChangeAtBeginningOrEnd,
-    addDifferentRow,
+    addRowWithIncreaseOrDecrease,
   } = props;
+  function determineIncreaseOrDecreaseOptions() {
+    const changes = { changesLeft: 0, changesRight: 0 };
+    if (changeAtBeginningOrEnd === 'left' || changeAtBeginningOrEnd === 'bothEnds') {
+      changes.changesLeft = increaseOrDecrease === 'increase' ? numberStitchesToChange : -numberStitchesToChange;
+    }
+    if (changeAtBeginningOrEnd === 'right' || changeAtBeginningOrEnd === 'bothEnds') {
+      changes.changesRight = increaseOrDecrease === 'increase' ? numberStitchesToChange : -numberStitchesToChange;
+    }
+    console.log({ changes });
 
+    addRowWithIncreaseOrDecrease(changes)
+  }
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Select
@@ -93,12 +104,17 @@ const IncreaseOrDecreaseInput: FunctionComponent<IncreaseOrDecreaseInputProps> =
         sx={{ marginLeft: '10px' }}
         onChange={(event) => setChangeAtBeginningOrEnd(event.target.value as StitchChangePlace)}
       >
-        <MenuItem value={'beginning'}>beginning</MenuItem>
-        <MenuItem value={'end'}>end</MenuItem>
+        <MenuItem value={'left'}>left</MenuItem>
+        <MenuItem value={'right'}>right</MenuItem>
         <MenuItem value={'bothEnds'}>both ends</MenuItem>
       </Select>
       <span>of the row</span>
-      <CheckCircleIcon color="success" fontSize="large" sx={{ display: 'inline' }} onClick={() => addDifferentRow()} />
+      <CheckCircleIcon
+        color="success"
+        fontSize="large"
+        sx={{ display: 'inline' }}
+        onClick={() => determineIncreaseOrDecreaseOptions()}
+      />
     </Box>
   );
 };

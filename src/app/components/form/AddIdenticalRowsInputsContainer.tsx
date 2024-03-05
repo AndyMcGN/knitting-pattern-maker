@@ -1,8 +1,10 @@
 import { Dispatch, FunctionComponent, SetStateAction, useState } from 'react';
 import AddManyRowsInput from './AddManyRowsInput';
-import AddRowInput from './AddRowInput';
+import { AddCustomRow } from './AddRowInput';
+import AddIdenticalRow from './AddRowInput';
+import IncreaseOrDecreaseInputContainer from './IncreaseOrDecreaseInputContainer';
 
-interface AddIdenticalRowsInputsContainerProps {
+interface AddRowsInputsContainerProps {
   pattern: Pattern;
   setPattern: Dispatch<SetStateAction<Pattern>>;
   currentNumberOfStitches: number;
@@ -11,9 +13,7 @@ interface AddIdenticalRowsInputsContainerProps {
   setGridSize: Dispatch<SetStateAction<GridSize>>;
 }
 
-const AddIdenticalRowsInputsContainer: FunctionComponent<AddIdenticalRowsInputsContainerProps> = (
-  props: AddIdenticalRowsInputsContainerProps,
-) => {
+const AddRowsInputsContainer: FunctionComponent<AddRowsInputsContainerProps> = (props: AddRowsInputsContainerProps) => {
   const {
     pattern,
     currentNumberOfStitches,
@@ -24,15 +24,39 @@ const AddIdenticalRowsInputsContainer: FunctionComponent<AddIdenticalRowsInputsC
   } = props;
   const [numberOfSameRows, setNumberOfSameRows] = useState<number>(3);
 
-  function addManyRows(numberOfStitches: number, numberOfRows: number) {
+  function addManyRows(numberOfRows: number) {
     for (let i = 0; i < numberOfRows; i++) {
-      addRow(numberOfStitches);
+      addIdenticalRow();
     }
   }
+  function addIdenticalRow() {
+    const lastRow = pattern.rows[pattern.rows.length - 1];
+    updatePatternWithRow(lastRow);
+  }
+  function addRowWithIncreaseOrDecrease(changes: { changesLeft: number; changesRight: number }) {
+    const lastRow = pattern.rows[pattern.rows.length - 1];
+    const oldFirstStitch = lastRow.findIndex((val) => val === true);
+    const oldLastStitch = lastRow.findLastIndex((val) => val === true);
 
-  function addRow(numberOfStitches: number) {
+    const newRow = [...lastRow];
+    const newFirstStitch = oldFirstStitch - changes.changesLeft;
+    const newLastStitch = oldLastStitch + changes.changesRight;
+    for (let i = 0; i < lastRow.length; i++) {
+      newRow[i] = newFirstStitch <= i && i <= newLastStitch ? true : false;
+    }
+    updatePatternWithRow(newRow);
+  }
+
+  function addCustomRow(numberOfStitches: number) {
     if (numberOfStitches === 0) return;
-    // Have a few empty stitches outside pattern.
+    const lastRow = pattern.rows[pattern.rows.length - 1];
+    // adding identical row
+    if (pattern.rows[0] && numberOfStitches === lastRow.filter((stitch) => Boolean(stitch)).length) {
+      // this is horrible, should probs save the last noOfStitches
+      updatePatternWithRow(lastRow);
+      return;
+    }
+    // if no rows yet or the row number is different
     let correctGridWidth = gridWidth;
     if (numberOfStitches + 8 > gridWidth) {
       correctGridWidth = numberOfStitches + 8;
@@ -42,19 +66,18 @@ const AddIdenticalRowsInputsContainer: FunctionComponent<AddIdenticalRowsInputsC
     const middleColumn: number = Math.floor((correctGridWidth + 1) / 2);
     const startColumn: number = middleColumn - Math.floor(numberOfStitches / 2);
 
-    // If numberOfStitches is odd, choose the right middle column
     const endColumn: number = startColumn + numberOfStitches - 1;
-    console.log({ gridWidth, startColumn, endColumn, middleColumn });
 
-    updatePatternWithRow(startColumn, endColumn, correctGridWidth);
-  }
-
-  function updatePatternWithRow(startColumn: number, endColumn: number, updatedGridLength: number) {
-    const newRow = Array(updatedGridLength).fill(false);
+    const newRow = Array(correctGridWidth).fill(false);
     for (let i = startColumn; i <= endColumn; i++) {
       newRow[i - 1] = true;
     }
+    updatePatternWithRow(newRow);
+  }
 
+  //   create row
+
+  function updatePatternWithRow(newRow: boolean[]) {
     setPattern((prevPattern: Pattern) => ({
       ...prevPattern,
       rows: [...prevPattern.rows, newRow],
@@ -63,10 +86,10 @@ const AddIdenticalRowsInputsContainer: FunctionComponent<AddIdenticalRowsInputsC
 
   return (
     <div>
-      <AddRowInput
+      <AddCustomRow
         currentNumberOfStitches={currentNumberOfStitches}
         setCurrentNumberOfStitches={setCurrentNumberOfStitches}
-        addRow={addRow}
+        addCustomRow={addCustomRow}
         pattern={pattern}
       />
       <AddManyRowsInput
@@ -75,8 +98,17 @@ const AddIdenticalRowsInputsContainer: FunctionComponent<AddIdenticalRowsInputsC
         currentNumberOfStitches={currentNumberOfStitches}
         addManyRows={addManyRows}
       />
+      {pattern && pattern.rows.length > 0 && (
+        <>
+          <AddIdenticalRow addIdenticalRow={addIdenticalRow} />
+          <IncreaseOrDecreaseInputContainer
+            currentNumberOfStitches={currentNumberOfStitches}
+            addRowWithIncreaseOrDecrease={addRowWithIncreaseOrDecrease}
+          />
+        </>
+      )}
     </div>
   );
 };
 
-export default AddIdenticalRowsInputsContainer;
+export default AddRowsInputsContainer;

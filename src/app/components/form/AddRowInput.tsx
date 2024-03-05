@@ -1,14 +1,14 @@
-import { FunctionComponent } from 'react';
+import { Dispatch, FunctionComponent, SetStateAction } from 'react';
 
-interface AddRowInputProps {
+interface AddCustomRowProps {
   currentNumberOfStitches: number;
-  setCurrentNumberOfStitches: Function;
-  addRow: Function;
+  setCurrentNumberOfStitches: Dispatch<SetStateAction<number>>;
+  addCustomRow: (numberOfStitches: number) => void;
   pattern: Pattern;
 }
 
-const AddRowInput: FunctionComponent<AddRowInputProps> = (props) => {
-  const { currentNumberOfStitches, addRow, pattern, setCurrentNumberOfStitches } = props;
+export const AddCustomRow: FunctionComponent<AddCustomRowProps> = (props) => {
+  const { currentNumberOfStitches, addCustomRow, pattern, setCurrentNumberOfStitches } = props;
   return (
     <>
       <p>How many stitches to start with?</p>
@@ -20,7 +20,7 @@ const AddRowInput: FunctionComponent<AddRowInputProps> = (props) => {
 
       <button
         onClick={() => {
-          addRow(currentNumberOfStitches);
+          addCustomRow(currentNumberOfStitches);
         }}
       >
         {pattern.rows.length === 0 ? 'Create first row' : 'Add same length row'}
@@ -29,4 +29,21 @@ const AddRowInput: FunctionComponent<AddRowInputProps> = (props) => {
   );
 };
 
-export default AddRowInput;
+interface AddIdenticalRowProps {
+  addIdenticalRow: () => void;
+}
+
+const AddIdenticalRow: FunctionComponent<AddIdenticalRowProps> = (props: AddIdenticalRowProps) => {
+  const { addIdenticalRow } = props;
+  return (
+    <button
+      onClick={() => {
+        addIdenticalRow();
+      }}
+    >
+      Add Identical Row
+    </button>
+  );
+};
+
+export default AddIdenticalRow;

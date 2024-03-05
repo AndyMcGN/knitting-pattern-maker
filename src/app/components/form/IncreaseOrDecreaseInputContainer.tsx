@@ -3,18 +3,17 @@ import IncreaseOrDecreaseInput from './IncreaseOrDecreaseInput';
 
 interface IncreaseOrDecreaseInputContainerProps {
   currentNumberOfStitches: number;
+  addRowWithIncreaseOrDecrease: (changes: { changesLeft: number; changesRight: number }) => void;
 }
 
 const IncreaseOrDecreaseInputContainer: FunctionComponent<IncreaseOrDecreaseInputContainerProps> = (
   props: IncreaseOrDecreaseInputContainerProps,
 ) => {
-  const { currentNumberOfStitches } = props;
+  const { currentNumberOfStitches, addRowWithIncreaseOrDecrease } = props;
   const [increaseOrDecrease, setIncreaseOrDecrease] = useState<IncreaseOrDecrease>('increase');
   const [numberStitchesToChange, setNumberStitchesToChange] = useState<number>(0);
-  const [changeAtBeginningOrEnd, setChangeAtBeginningOrEnd] = useState<StitchChangePlace>('end');
-  function addDifferentRow() {
-    console.log({ increaseOrDecrease, numberStitchesToChange, changeAtBeginningOrEnd });
-  }
+  const [changeAtBeginningOrEnd, setChangeAtBeginningOrEnd] = useState<StitchChangePlace>('left');
+
   return (
     <IncreaseOrDecreaseInput
       increaseOrDecrease={increaseOrDecrease}
@@ -24,7 +23,7 @@ const IncreaseOrDecreaseInputContainer: FunctionComponent<IncreaseOrDecreaseInpu
       changeAtBeginningOrEnd={changeAtBeginningOrEnd}
       setIncreaseOrDecrease={setIncreaseOrDecrease}
       setChangeAtBeginningOrEnd={setChangeAtBeginningOrEnd}
-      addDifferentRow={addDifferentRow}
+      addRowWithIncreaseOrDecrease={addRowWithIncreaseOrDecrease}
     />
   );
 };

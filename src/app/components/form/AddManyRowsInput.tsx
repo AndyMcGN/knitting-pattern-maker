@@ -4,7 +4,7 @@ interface AddManyRowsInputProps {
   numberOfSameRows: number;
   setNumberOfSameRows: Dispatch<SetStateAction<number>>;
   currentNumberOfStitches: number;
-  addManyRows: Function;
+  addManyRows: (numberOfRows: number) => void;
 }
 
 const AddManyRowsInput: FunctionComponent<AddManyRowsInputProps> = (props: AddManyRowsInputProps) => {
@@ -20,7 +20,7 @@ const AddManyRowsInput: FunctionComponent<AddManyRowsInputProps> = (props: AddMa
       <span> identical rows with {currentNumberOfStitches} stitches</span>
       <button
         onClick={() => {
-          addManyRows(currentNumberOfStitches, numberOfSameRows);
+          addManyRows(numberOfSameRows);
         }}
       >
         Add rows

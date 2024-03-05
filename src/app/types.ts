@@ -8,4 +8,4 @@ interface GridSize {
 }
 
 type IncreaseOrDecrease = 'increase' | 'decrease';
-type StitchChangePlace = 'beginning' | 'end' | 'bothEnds';
+type StitchChangePlace = 'left' | 'right' | 'bothEnds';
