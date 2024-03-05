@@ -1,5 +1,5 @@
 import { Box, MenuItem, Select } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
+import { Dispatch, FunctionComponent, SetStateAction, useState } from 'react';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
 import { Unstable_NumberInput as BaseNumberInput } from '@mui/base/Unstable_NumberInput';
@@ -7,7 +7,14 @@ import styled from 'styled-components';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 interface IncreaseOrDecreaseInputProps {
+  increaseOrDecrease: IncreaseOrDecrease;
+  setIncreaseOrDecrease: Dispatch<SetStateAction<IncreaseOrDecrease>>;
+  numberStitchesToChange: number;
+  setNumberStitchesToChange: Dispatch<SetStateAction<number>>;
   currentNumberOfStitches: number;
+  changeAtBeginningOrEnd: StitchChangePlace;
+  setChangeAtBeginningOrEnd: Dispatch<SetStateAction<StitchChangePlace>>;
+  addDifferentRow: Function;
 }
 const StyledButton = styled.button`
   border-radius: 50%;
@@ -37,24 +44,28 @@ const StyledInput = styled.input`
 const IncreaseOrDecreaseInput: FunctionComponent<IncreaseOrDecreaseInputProps> = (
   props: IncreaseOrDecreaseInputProps,
 ) => {
-  const { currentNumberOfStitches } = props;
-  const [increaseOrDecrease, setIncreaseOrDecrease] = useState<'increase' | 'decrease'>('increase');
-  const [numberStitchesToChange, setNumberStitchesToChange] = useState<number>(0);
-  const [changeAtBeginningOrEnd, setChangeAtBeginningOrEnd] = useState<'beginning' | 'end' | 'bothEnds'>('end');
-  function addDifferentRow() {
-    console.log({ increaseOrDecrease, numberStitchesToChange, changeAtBeginningOrEnd });
-  }
+  const {
+    changeAtBeginningOrEnd,
+    increaseOrDecrease,
+    setIncreaseOrDecrease,
+    numberStitchesToChange,
+    setNumberStitchesToChange,
+    setChangeAtBeginningOrEnd,
+    addDifferentRow,
+  } = props;
+
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Select
         value={increaseOrDecrease}
         variant="standard"
-        onChange={(event) => setIncreaseOrDecrease(event.target.value as 'increase' | 'decrease')}
+        onChange={(event) => setIncreaseOrDecrease(event.target.value as IncreaseOrDecrease)}
       >
         <MenuItem value={'increase'}>Increase</MenuItem>
         <MenuItem value={'decrease'}>Decrease</MenuItem>
       </Select>
       <BaseNumberInput
+        min={0}
         value={numberStitchesToChange}
         onChange={(event, newValue) => setNumberStitchesToChange(newValue || 0)}
         slots={{
@@ -80,7 +91,7 @@ const IncreaseOrDecreaseInput: FunctionComponent<IncreaseOrDecreaseInputProps> =
         value={changeAtBeginningOrEnd}
         variant="standard"
         sx={{ marginLeft: '10px' }}
-        onChange={(event) => setChangeAtBeginningOrEnd(event.target.value as 'beginning' | 'end' | 'bothEnds')}
+        onChange={(event) => setChangeAtBeginningOrEnd(event.target.value as StitchChangePlace)}
       >
         <MenuItem value={'beginning'}>beginning</MenuItem>
         <MenuItem value={'end'}>end</MenuItem>

@@ -2,7 +2,9 @@
 import { useState } from 'react';
 import PatternDisplay from './components/PatternDisplay';
 import IncreaseOrDecreaseInput from './components/form/IncreaseOrDecreaseInput';
-import InputsContainer from './components/form/EditPatternInputsContainer';
+import InputsContainer from './components/form/AddIdenticalRowsInputsContainer';
+import AddIdenticalRowsInputsContainer from './components/form/AddIdenticalRowsInputsContainer';
+import IncreaseOrDecreaseInputContainer from './components/form/IncreaseOrDecreaseInputContainer';
 
 export default function Home() {
   const [pattern, setPattern] = useState<Pattern>({ rows: [] });
@@ -12,7 +14,7 @@ export default function Home() {
   return (
     <>
       {/* <GridSizeInput setGridSize={setGridSize} gridSize={gridSize} /> */}
-      <InputsContainer
+      <AddIdenticalRowsInputsContainer
         gridSize={gridSize}
         setGridSize={setGridSize}
         pattern={pattern}
@@ -20,11 +22,11 @@ export default function Home() {
         currentNumberOfStitches={currentNumberOfStitches}
         setCurrentNumberOfStitches={setCurrentNumberOfStitches}
       />
-      {/* {pattern.rows.length !== 0 && (
+      {pattern.rows.length !== 0 && (
         <>
-          <IncreaseOrDecreaseInput currentNumberOfStitches={currentNumberOfStitches} />
+          <IncreaseOrDecreaseInputContainer currentNumberOfStitches={currentNumberOfStitches} />
         </>
-      )} */}
+      )}
       <PatternDisplay pattern={pattern} setPattern={setPattern} gridSize={gridSize} />
     </>
   );

@@ -2,7 +2,7 @@ import { Dispatch, FunctionComponent, SetStateAction, useState } from 'react';
 import AddManyRowsInput from './AddManyRowsInput';
 import AddRowInput from './AddRowInput';
 
-interface EditPatternInputsContainerProps {
+interface AddIdenticalRowsInputsContainerProps {
   pattern: Pattern;
   setPattern: Dispatch<SetStateAction<Pattern>>;
   currentNumberOfStitches: number;
@@ -11,7 +11,9 @@ interface EditPatternInputsContainerProps {
   setGridSize: Dispatch<SetStateAction<GridSize>>;
 }
 
-const EditPatternInputsContainer: FunctionComponent<EditPatternInputsContainerProps> = (props: EditPatternInputsContainerProps) => {
+const AddIdenticalRowsInputsContainer: FunctionComponent<AddIdenticalRowsInputsContainerProps> = (
+  props: AddIdenticalRowsInputsContainerProps,
+) => {
   const {
     pattern,
     currentNumberOfStitches,
@@ -27,7 +29,7 @@ const EditPatternInputsContainer: FunctionComponent<EditPatternInputsContainerPr
       addRow(numberOfStitches);
     }
   }
-  
+
   function addRow(numberOfStitches: number) {
     if (numberOfStitches === 0) return;
     // Have a few empty stitches outside pattern.
@@ -35,7 +37,7 @@ const EditPatternInputsContainer: FunctionComponent<EditPatternInputsContainerPr
     if (numberOfStitches + 8 > gridWidth) {
       correctGridWidth = numberOfStitches + 8;
 
-      setGridSize((prevGridSize) => ({ ...prevGridSize, width: correctGridWidth }));
+      setGridSize((prevGridSize: GridSize) => ({ ...prevGridSize, width: correctGridWidth }));
     }
     const middleColumn: number = Math.floor((correctGridWidth + 1) / 2);
     const startColumn: number = middleColumn - Math.floor(numberOfStitches / 2);
@@ -53,7 +55,7 @@ const EditPatternInputsContainer: FunctionComponent<EditPatternInputsContainerPr
       newRow[i - 1] = true;
     }
 
-    setPattern((prevPattern) => ({
+    setPattern((prevPattern: Pattern) => ({
       ...prevPattern,
       rows: [...prevPattern.rows, newRow],
     }));
@@ -77,4 +79,4 @@ const EditPatternInputsContainer: FunctionComponent<EditPatternInputsContainerPr
   );
 };
 
-export default EditPatternInputsContainer;
+export default AddIdenticalRowsInputsContainer;
