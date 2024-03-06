@@ -9,19 +9,10 @@ interface AddRowsInputsContainerProps {
   setPattern: Dispatch<SetStateAction<Pattern>>;
   currentNumberOfStitches: number;
   setCurrentNumberOfStitches: Dispatch<SetStateAction<number>>;
-  gridSize: GridSize;
-  setGridSize: Dispatch<SetStateAction<GridSize>>;
 }
 
 const AddRowsInputsContainer: FunctionComponent<AddRowsInputsContainerProps> = (props: AddRowsInputsContainerProps) => {
-  const {
-    pattern,
-    currentNumberOfStitches,
-    setCurrentNumberOfStitches,
-    setPattern,
-    gridSize: { width: gridWidth },
-    setGridSize,
-  } = props;
+  const { pattern, currentNumberOfStitches, setCurrentNumberOfStitches, setPattern } = props;
   const [numberOfSameRows, setNumberOfSameRows] = useState<number>(3);
 
   function addManyRows(numberOfRows: number) {
@@ -49,26 +40,26 @@ const AddRowsInputsContainer: FunctionComponent<AddRowsInputsContainerProps> = (
 
   function addCustomRow(numberOfStitches: number) {
     if (numberOfStitches === 0) return;
-    const lastRow = pattern.rows[pattern.rows.length - 1];
+
+    const lastRow = pattern.rows[pattern.rows?.length - 1] || [];
     // adding identical row
-    if (pattern.rows[0] && numberOfStitches === lastRow.filter((stitch) => Boolean(stitch)).length) {
+    if (lastRow && numberOfStitches === lastRow.filter((stitch) => Boolean(stitch)).length) {
       // this is horrible, should probs save the last noOfStitches
       updatePatternWithRow(lastRow);
       return;
     }
     // if no rows yet or the row number is different
-    let correctGridWidth = gridWidth;
-    if (numberOfStitches + 8 > gridWidth) {
-      correctGridWidth = numberOfStitches + 8;
-
-      setGridSize((prevGridSize: GridSize) => ({ ...prevGridSize, width: correctGridWidth }));
+    let lengthOfNewRow = lastRow.length;
+    if (numberOfStitches + 8 > lastRow.length) {
+      lengthOfNewRow = numberOfStitches + 8;
+      addExtraStitchesToPattern(lengthOfNewRow);
     }
-    const middleColumn: number = Math.floor((correctGridWidth + 1) / 2);
+    const middleColumn: number = Math.floor((lengthOfNewRow + 1) / 2);
     const startColumn: number = middleColumn - Math.floor(numberOfStitches / 2);
 
     const endColumn: number = startColumn + numberOfStitches - 1;
 
-    const newRow = Array(correctGridWidth).fill(false);
+    const newRow = Array(lengthOfNewRow).fill(false);
     for (let i = startColumn; i <= endColumn; i++) {
       newRow[i - 1] = true;
     }
@@ -76,7 +67,19 @@ const AddRowsInputsContainer: FunctionComponent<AddRowsInputsContainerProps> = (
   }
 
   //   create row
-
+  function addExtraStitchesToPattern(newRowLength: number) {
+    const patternWithExtraStitches = pattern;
+    for (const row of patternWithExtraStitches.rows) {
+      if (row.length < newRowLength) {
+        const extraStitchesOnEachEnd = Math.floor((newRowLength - row.length) / 2);
+        for (let i = 0; i < extraStitchesOnEachEnd; i++) {
+          row.unshift(false);
+          row.push(false);
+        }
+      }
+    }
+    setPattern(() => patternWithExtraStitches);
+  }
   function updatePatternWithRow(newRow: boolean[]) {
     setPattern((prevPattern: Pattern) => ({
       ...prevPattern,
