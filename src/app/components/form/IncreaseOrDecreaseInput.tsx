@@ -20,7 +20,7 @@ const IncreaseOrDecreaseInputContainer: FunctionComponent<IncreaseOrDecreaseInpu
 ) => {
   const { addRowWithIncreaseOrDecrease } = props;
   const [increaseOrDecrease, setIncreaseOrDecrease] = useState<IncreaseOrDecrease>('increase');
-  const [numberStitchesToChange, setNumberStitchesToChange] = useState<number>(0);
+  const [numberStitchesToChange, setNumberStitchesToChange] = useState<number>(1);
   const [changeAtBeginningOrEnd, setChangeAtBeginningOrEnd] = useState<StitchChangePlace>('left');
 
   const StyledButton = styled.button`
@@ -59,7 +59,7 @@ const IncreaseOrDecreaseInputContainer: FunctionComponent<IncreaseOrDecreaseInpu
         <MenuItem value={'decrease'}>Decrease</MenuItem>
       </Select>
       <BaseNumberInput
-        min={0}
+        min={1}
         value={numberStitchesToChange}
         onChange={(event, newValue) => setNumberStitchesToChange(newValue || 0)}
         slots={{

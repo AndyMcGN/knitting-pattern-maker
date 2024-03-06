@@ -3,6 +3,7 @@ import AddManyRowsInput from './AddManyRowsInput';
 import { AddCustomRow } from './AddRowInput';
 import AddIdenticalRow from './AddRowInput';
 import IncreaseOrDecreaseInputContainer from './IncreaseOrDecreaseInput';
+import { Button } from '@mui/material';
 
 interface EditPatternFormProps {
   pattern: Pattern;
@@ -109,7 +110,7 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
     let newRowLength;
     if (oldStartColumn < 5 || freeStitchesAtEnd < 2) {
       const extraStitchesNeededAtStart = 5 - oldStartColumn;
-      const extraStitchesAtEnd = 4 - freeStitchesAtEnd;
+      const extraStitchesAtEnd = 5 - freeStitchesAtEnd;
       addExtraStitches({ left: extraStitchesNeededAtStart, right: extraStitchesAtEnd });
       newStartColumn = oldStartColumn + extraStitchesNeededAtStart;
       newEndColumn = oldEndColumn + extraStitchesNeededAtStart;
@@ -142,6 +143,10 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
     }));
   }
 
+  function deleteLastRow(): void {
+    setPattern((prevPattern) => ({ ...prevPattern, rows: prevPattern.rows.slice(0, -1) }));
+  }
+
   return (
     <div>
       <AddCustomRow
@@ -163,6 +168,7 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
             currentNumberOfStitches={currentNumberOfStitches}
             addRowWithIncreaseOrDecrease={addRowWithIncreaseOrDecrease}
           />
+          <Button onClick={() => deleteLastRow()}>Undo Last Row</Button>
         </>
       )}
     </div>
