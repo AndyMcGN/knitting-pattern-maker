@@ -40,18 +40,23 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
     }
 
     const lastRow = pattern.rows[pattern.rows.length - 1];
-    const oldFirstStitch = lastRow.findIndex((val) => val === true);
-    const oldLastStitch = lastRow.findLastIndex((val) => val === true);
+    const firstColumnBeforeChange = lastRow.findIndex((val) => val === true);
+    const lastColumnBeforeChange = lastRow.findLastIndex((val) => val === true);
 
     const newRow = [...lastRow];
-    const newFirstStitch = oldFirstStitch - changesLeft;
-    const newLastStitch = oldLastStitch + changesRight;
-    for (let i = 0; i < lastRow.length; i++) {
-      newRow[i] = newFirstStitch <= i && i <= newLastStitch ? true : false;
+    const firstStitch = firstColumnBeforeChange - changesLeft;
+    const lastColumn = lastColumnBeforeChange + changesRight;
+    // rename all these above to old/something not so similar to the below
+    const { newEndColumn, newRowLength, newStartColumn } = adjustGridAndIndexesForExtraStitches({
+      oldEndColumn: lastColumn,
+      oldRowLength: newRow.length,
+      oldStartColumn: firstStitch,
+    });
+    for (let i = 0; i < newRowLength; i++) {
+      newRow[i] = newStartColumn <= i && i <= newEndColumn ? true : false;
     }
     updatePatternWithRow(newRow);
   }
-
 
   function addCustomRow(numberOfStitches: number) {
     if (numberOfStitches === 0) return;
@@ -63,38 +68,73 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
       updatePatternWithRow(lastRow);
       return;
     }
+
+    if (pattern.rows.length === 0) {
+      const initialRow = Array(4).fill(false).concat(Array(numberOfStitches).fill(true)).concat(Array(4).fill(false));
+      setPattern((prevPattern) => ({ ...prevPattern, rows: [initialRow] }));
+      return;
+    }
     // if no rows yet or the row number is different
     let lengthOfNewRow = lastRow.length;
-    if (numberOfStitches + 8 > lastRow.length) {
-      lengthOfNewRow = numberOfStitches + 8;
-      addExtraStitchesToPattern(lengthOfNewRow);
-    }
+
     const middleColumn: number = Math.floor((lengthOfNewRow + 1) / 2);
-    const startColumn: number = middleColumn - Math.floor(numberOfStitches / 2);
+    let startColumn: number = middleColumn - Math.floor(numberOfStitches / 2);
 
-    const endColumn: number = startColumn + numberOfStitches - 1;
-
-    const newRow = Array(lengthOfNewRow).fill(false);
-    for (let i = startColumn; i <= endColumn; i++) {
+    let endColumn: number = startColumn + numberOfStitches - 1;
+    const { newEndColumn, newRowLength, newStartColumn } = adjustGridAndIndexesForExtraStitches({
+      oldStartColumn: startColumn,
+      oldEndColumn: endColumn,
+      oldRowLength: lengthOfNewRow,
+    });
+    const newRow = Array(newRowLength).fill(false);
+    for (let i = newStartColumn; i <= newEndColumn; i++) {
       newRow[i - 1] = true;
     }
     updatePatternWithRow(newRow);
   }
 
-  //   create row
-  function addExtraStitchesToPattern(newRowLength: number) {
+  function adjustGridAndIndexesForExtraStitches(oldValues: {
+    oldStartColumn: number;
+    oldEndColumn: number;
+    oldRowLength: number;
+  }): {
+    newStartColumn: number;
+    newEndColumn: number;
+    newRowLength: number;
+  } {
+    const { oldStartColumn, oldEndColumn, oldRowLength } = oldValues;
+    const freeStitchesAtEnd = oldRowLength - oldEndColumn;
+    let newStartColumn;
+    let newEndColumn;
+    let newRowLength;
+    if (oldStartColumn < 5 || freeStitchesAtEnd < 2) {
+      const extraStitchesNeededAtStart = 5 - oldStartColumn;
+      const extraStitchesAtEnd = 4 - freeStitchesAtEnd;
+      addExtraStitches({ left: extraStitchesNeededAtStart, right: extraStitchesAtEnd });
+      newStartColumn = oldStartColumn + extraStitchesNeededAtStart;
+      newEndColumn = oldEndColumn + extraStitchesNeededAtStart;
+      newRowLength = oldRowLength + extraStitchesNeededAtStart + extraStitchesAtEnd;
+    }
+
+    return {
+      newEndColumn: newEndColumn || oldEndColumn,
+      newRowLength: newRowLength || oldRowLength,
+      newStartColumn: newStartColumn || oldStartColumn,
+    };
+  }
+  function addExtraStitches(extraStitches: { left: number; right: number }) {
     const patternWithExtraStitches = pattern;
     for (const row of patternWithExtraStitches.rows) {
-      if (row.length < newRowLength) {
-        const extraStitchesOnEachEnd = Math.floor((newRowLength - row.length) / 2);
-        for (let i = 0; i < extraStitchesOnEachEnd; i++) {
-          row.unshift(false);
-          row.push(false);
-        }
+      for (let i = 0; i < extraStitches.left; i++) {
+        row.unshift(false);
+      }
+      for (let i = 0; i < extraStitches.right; i++) {
+        row.push(false);
       }
     }
     setPattern(() => patternWithExtraStitches);
   }
+
   function updatePatternWithRow(newRow: boolean[]) {
     setPattern((prevPattern: Pattern) => ({
       ...prevPattern,
