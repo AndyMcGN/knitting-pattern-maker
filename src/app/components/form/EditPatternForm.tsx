@@ -2,18 +2,17 @@ import { Dispatch, FunctionComponent, SetStateAction, useState } from 'react';
 import AddManyRowsInput from './AddManyRowsInput';
 import { AddCustomRow } from './AddRowInput';
 import AddIdenticalRow from './AddRowInput';
-import IncreaseOrDecreaseInputContainer from './IncreaseOrDecreaseInputContainer';
+import IncreaseOrDecreaseInputContainer from './IncreaseOrDecreaseInput';
 
-interface AddRowsInputsContainerProps {
+interface EditPatternFormProps {
   pattern: Pattern;
   setPattern: Dispatch<SetStateAction<Pattern>>;
-  currentNumberOfStitches: number;
-  setCurrentNumberOfStitches: Dispatch<SetStateAction<number>>;
 }
 
-const AddRowsInputsContainer: FunctionComponent<AddRowsInputsContainerProps> = (props: AddRowsInputsContainerProps) => {
-  const { pattern, currentNumberOfStitches, setCurrentNumberOfStitches, setPattern } = props;
+const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPatternFormProps) => {
+  const { pattern, setPattern } = props;
   const [numberOfSameRows, setNumberOfSameRows] = useState<number>(3);
+  const [currentNumberOfStitches, setCurrentNumberOfStitches] = useState<number>(5);
 
   function addManyRows(numberOfRows: number) {
     for (let i = 0; i < numberOfRows; i++) {
@@ -24,19 +23,35 @@ const AddRowsInputsContainer: FunctionComponent<AddRowsInputsContainerProps> = (
     const lastRow = pattern.rows[pattern.rows.length - 1];
     updatePatternWithRow(lastRow);
   }
-  function addRowWithIncreaseOrDecrease(changes: { changesLeft: number; changesRight: number }) {
+
+  function addRowWithIncreaseOrDecrease(options: {
+    increaseOrDecrease: IncreaseOrDecrease;
+    changeAtBeginningOrEnd: StitchChangePlace;
+    numberStitchesToChange: number;
+  }) {
+    const { increaseOrDecrease, changeAtBeginningOrEnd, numberStitchesToChange } = options;
+    let changesLeft = 0;
+    let changesRight = 0;
+    if (changeAtBeginningOrEnd === 'left' || changeAtBeginningOrEnd === 'bothEnds') {
+      changesLeft = increaseOrDecrease === 'increase' ? numberStitchesToChange : -numberStitchesToChange;
+    }
+    if (changeAtBeginningOrEnd === 'right' || changeAtBeginningOrEnd === 'bothEnds') {
+      changesRight = increaseOrDecrease === 'increase' ? numberStitchesToChange : -numberStitchesToChange;
+    }
+
     const lastRow = pattern.rows[pattern.rows.length - 1];
     const oldFirstStitch = lastRow.findIndex((val) => val === true);
     const oldLastStitch = lastRow.findLastIndex((val) => val === true);
 
     const newRow = [...lastRow];
-    const newFirstStitch = oldFirstStitch - changes.changesLeft;
-    const newLastStitch = oldLastStitch + changes.changesRight;
+    const newFirstStitch = oldFirstStitch - changesLeft;
+    const newLastStitch = oldLastStitch + changesRight;
     for (let i = 0; i < lastRow.length; i++) {
       newRow[i] = newFirstStitch <= i && i <= newLastStitch ? true : false;
     }
     updatePatternWithRow(newRow);
   }
+
 
   function addCustomRow(numberOfStitches: number) {
     if (numberOfStitches === 0) return;
@@ -114,4 +129,4 @@ const AddRowsInputsContainer: FunctionComponent<AddRowsInputsContainerProps> = (
   );
 };
 
-export default AddRowsInputsContainer;
+export default EditPatternForm;

@@ -1,70 +1,53 @@
-import { Box, MenuItem, Select } from '@mui/material';
-import { Dispatch, FunctionComponent, SetStateAction, useState } from 'react';
-import RemoveIcon from '@mui/icons-material/Remove';
-import AddIcon from '@mui/icons-material/Add';
+import { FunctionComponent, useState } from 'react';
+import { Box, Select, MenuItem } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Unstable_NumberInput as BaseNumberInput } from '@mui/base/Unstable_NumberInput';
 import styled from 'styled-components';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from '@mui/icons-material/Add';
 
-interface IncreaseOrDecreaseInputProps {
-  increaseOrDecrease: IncreaseOrDecrease;
-  setIncreaseOrDecrease: Dispatch<SetStateAction<IncreaseOrDecrease>>;
-  numberStitchesToChange: number;
-  setNumberStitchesToChange: Dispatch<SetStateAction<number>>;
+interface IncreaseOrDecreaseInputContainerProps {
   currentNumberOfStitches: number;
-  changeAtBeginningOrEnd: StitchChangePlace;
-  setChangeAtBeginningOrEnd: Dispatch<SetStateAction<StitchChangePlace>>;
-  addRowWithIncreaseOrDecrease: (changes: { changesLeft: number; changesRight: number }) => void;
+  addRowWithIncreaseOrDecrease: (options: {
+    increaseOrDecrease: IncreaseOrDecrease;
+    changeAtBeginningOrEnd: StitchChangePlace;
+    numberStitchesToChange: number;
+  }) => void;
 }
-const StyledButton = styled.button`
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-`;
-const StyledInputRoot = styled.div`
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 400;
-  display: inline-flex;
-  flex-flow: row nowrap;
-  align-items: center;
-`;
-const StyledInput = styled.input`
-  border-radius: 8px;
-  margin: 0 8px;
-  padding: 10px 12px;
-  outline: 0;
-  min-width: 0;
-  width: 4rem;
-  text-align: center;
-`;
-const IncreaseOrDecreaseInput: FunctionComponent<IncreaseOrDecreaseInputProps> = (
-  props: IncreaseOrDecreaseInputProps,
-) => {
-  const {
-    changeAtBeginningOrEnd,
-    increaseOrDecrease,
-    setIncreaseOrDecrease,
-    numberStitchesToChange,
-    setNumberStitchesToChange,
-    setChangeAtBeginningOrEnd,
-    addRowWithIncreaseOrDecrease,
-  } = props;
-  function determineIncreaseOrDecreaseOptions() {
-    const changes = { changesLeft: 0, changesRight: 0 };
-    if (changeAtBeginningOrEnd === 'left' || changeAtBeginningOrEnd === 'bothEnds') {
-      changes.changesLeft = increaseOrDecrease === 'increase' ? numberStitchesToChange : -numberStitchesToChange;
-    }
-    if (changeAtBeginningOrEnd === 'right' || changeAtBeginningOrEnd === 'bothEnds') {
-      changes.changesRight = increaseOrDecrease === 'increase' ? numberStitchesToChange : -numberStitchesToChange;
-    }
-    console.log({ changes });
 
-    addRowWithIncreaseOrDecrease(changes)
-  }
+const IncreaseOrDecreaseInputContainer: FunctionComponent<IncreaseOrDecreaseInputContainerProps> = (
+  props: IncreaseOrDecreaseInputContainerProps,
+) => {
+  const { addRowWithIncreaseOrDecrease } = props;
+  const [increaseOrDecrease, setIncreaseOrDecrease] = useState<IncreaseOrDecrease>('increase');
+  const [numberStitchesToChange, setNumberStitchesToChange] = useState<number>(0);
+  const [changeAtBeginningOrEnd, setChangeAtBeginningOrEnd] = useState<StitchChangePlace>('left');
+
+  const StyledButton = styled.button`
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+  `;
+  const StyledInputRoot = styled.div`
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+    display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: center;
+  `;
+  const StyledInput = styled.input`
+    border-radius: 8px;
+    margin: 0 8px;
+    padding: 10px 12px;
+    outline: 0;
+    min-width: 0;
+    width: 4rem;
+    text-align: center;
+  `;
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Select
@@ -113,10 +96,12 @@ const IncreaseOrDecreaseInput: FunctionComponent<IncreaseOrDecreaseInputProps> =
         color="success"
         fontSize="large"
         sx={{ display: 'inline' }}
-        onClick={() => determineIncreaseOrDecreaseOptions()}
+        onClick={() =>
+          addRowWithIncreaseOrDecrease({ increaseOrDecrease, changeAtBeginningOrEnd, numberStitchesToChange })
+        }
       />
     </Box>
   );
 };
 
-export default IncreaseOrDecreaseInput;
+export default IncreaseOrDecreaseInputContainer;
