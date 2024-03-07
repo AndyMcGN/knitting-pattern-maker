@@ -54,13 +54,14 @@ const StyledGrid = styled.div`
 `;
 
 export const Grid: FunctionComponent<GridProps> = (props: GridProps) => {
-  const {
-    pattern,
-    setPattern,
-  } = props;
+  const { pattern, setPattern } = props;
 
+  function toggleEmptyStitch(rowIndex: number, colIndex: number) {
+    const updatedRows = pattern.rows;
+    updatedRows[rowIndex][colIndex] = !updatedRows[rowIndex][colIndex];
+    setPattern({ ...pattern, rows: updatedRows });
+  }
 
-  console.log(pattern);
   return (
     <StyledGrid>
       {pattern &&
@@ -68,7 +69,7 @@ export const Grid: FunctionComponent<GridProps> = (props: GridProps) => {
         pattern.rows.map((row, rowIndex) => (
           <StyledRow key={rowIndex} $index={rowIndex}>
             {row.map((stitch, colIndex) => {
-              return <Stitch isKnit={stitch} key={colIndex} />;
+              return <Stitch isKnit={stitch} key={colIndex} onClick={() => toggleEmptyStitch(rowIndex, colIndex)} />;
             })}
           </StyledRow>
         ))}

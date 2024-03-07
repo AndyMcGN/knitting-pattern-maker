@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import { Dispatch, FunctionComponent, SetStateAction } from 'react';
 
 interface AddCustomRowProps {
@@ -36,13 +37,14 @@ interface AddIdenticalRowProps {
 const AddIdenticalRow: FunctionComponent<AddIdenticalRowProps> = (props: AddIdenticalRowProps) => {
   const { addIdenticalRow } = props;
   return (
-    <button
+    <Button
+      variant="contained"
       onClick={() => {
         addIdenticalRow();
       }}
     >
       Add Identical Row
-    </button>
+    </Button>
   );
 };
 
