@@ -4,6 +4,7 @@ import { AddCustomRow } from './AddRowInput';
 import AddIdenticalRow from './AddRowInput';
 import IncreaseOrDecreaseInputContainer from './IncreaseOrDecreaseInput';
 import { Button } from '@mui/material';
+import AddRowsUpToNInput from './AddRowsUpToNInput';
 
 interface EditPatternFormProps {
   pattern: Pattern;
@@ -21,7 +22,7 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
     }
   }
   function addIdenticalRow() {
-    const lastRow = pattern.rows[pattern.rows.length - 1];
+    const lastRow = pattern.rows[pattern.rows.length - 1].slice();
     updatePatternWithRow(lastRow);
   }
 
@@ -124,15 +125,17 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
     };
   }
   function addExtraStitches(extraStitches: { left: number; right: number }) {
-    const patternWithExtraStitches = pattern;
-    for (const row of patternWithExtraStitches.rows) {
+    const newRows = pattern.rows.map((row) => {
+      let newRow = row.slice();
       for (let i = 0; i < extraStitches.left; i++) {
-        row.unshift(false);
+        newRow.unshift(false);
       }
       for (let i = 0; i < extraStitches.right; i++) {
-        row.push(false);
+        newRow.push(false);
       }
-    }
+      return newRow;
+    });
+    const patternWithExtraStitches = { ...pattern, rows: newRows };
     setPattern(() => patternWithExtraStitches);
   }
 
@@ -145,6 +148,11 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
 
   function deleteLastRow(): void {
     setPattern((prevPattern) => ({ ...prevPattern, rows: prevPattern.rows.slice(0, -1) }));
+  }
+
+  function addRowsUpToN(targetRowNumber: number) {
+    const rowsNeeded = targetRowNumber - pattern.rows.length;
+    for (let i = 0; i < rowsNeeded; i++) addIdenticalRow();
   }
 
   return (
@@ -161,13 +169,11 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
         currentNumberOfStitches={currentNumberOfStitches}
         addManyRows={addManyRows}
       />
+      <AddRowsUpToNInput addRowsUpToN={addRowsUpToN} />
       {pattern && pattern.rows.length > 0 && (
         <>
           <AddIdenticalRow addIdenticalRow={addIdenticalRow} />
-          <IncreaseOrDecreaseInputContainer
-            currentNumberOfStitches={currentNumberOfStitches}
-            addRowWithIncreaseOrDecrease={addRowWithIncreaseOrDecrease}
-          />
+          <IncreaseOrDecreaseInputContainer addRowWithIncreaseOrDecrease={addRowWithIncreaseOrDecrease} />
           <Button onClick={() => deleteLastRow()}>Undo Last Row</Button>
         </>
       )}
