@@ -5,14 +5,10 @@ import AddIdenticalRow from './AddRowInput';
 import IncreaseOrDecreaseInputContainer from './IncreaseOrDecreaseInput';
 import { Button } from '@mui/material';
 import AddRowsUpToNInput from './AddRowsUpToNInput';
+import { usePatternStore } from '@/app/store';
 
-interface EditPatternFormProps {
-  pattern: Pattern;
-  setPattern: Dispatch<SetStateAction<Pattern>>;
-}
-
-const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPatternFormProps) => {
-  const { pattern, setPattern } = props;
+const EditPatternForm: FunctionComponent = () => {
+  const { pattern, setPattern, updatePatternWithRow } = usePatternStore((state) => state);
   const [numberOfSameRows, setNumberOfSameRows] = useState<number>(3);
   const [currentNumberOfStitches, setCurrentNumberOfStitches] = useState<number>(5);
 
@@ -73,7 +69,7 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
 
     if (pattern.rows.length === 0) {
       const initialRow = Array(4).fill(false).concat(Array(numberOfStitches).fill(true)).concat(Array(4).fill(false));
-      setPattern((prevPattern) => ({ ...prevPattern, rows: [initialRow] }));
+      setPattern({ ...pattern, rows: [initialRow] });
       return;
     }
     // if no rows yet or the row number is different
@@ -136,18 +132,15 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
       return newRow;
     });
     const patternWithExtraStitches = { ...pattern, rows: newRows };
-    setPattern(() => patternWithExtraStitches);
-  }
-
-  function updatePatternWithRow(newRow: boolean[]) {
-    setPattern((prevPattern: Pattern) => ({
-      ...prevPattern,
-      rows: [...prevPattern.rows, newRow],
-    }));
+    setPattern(patternWithExtraStitches);
   }
 
   function deleteLastRow(): void {
-    setPattern((prevPattern) => ({ ...prevPattern, rows: prevPattern.rows.slice(0, -1) }));
+    setPattern({ rows: pattern.rows.slice(0, -1) });
+  }
+
+  function deletePattern(): void {
+    setPattern({ rows: [] });
   }
 
   function addRowsUpToN(targetRowNumber: number) {
@@ -175,6 +168,7 @@ const EditPatternForm: FunctionComponent<EditPatternFormProps> = (props: EditPat
           <AddIdenticalRow addIdenticalRow={addIdenticalRow} />
           <IncreaseOrDecreaseInputContainer addRowWithIncreaseOrDecrease={addRowWithIncreaseOrDecrease} />
           <Button onClick={() => deleteLastRow()}>Undo Last Row</Button>
+          <Button onClick={() => deletePattern()}>DELETE PATTERN</Button>
         </>
       )}
     </div>

@@ -9,3 +9,10 @@ interface GridSize {
 
 type IncreaseOrDecrease = 'increase' | 'decrease';
 type StitchChangePlace = 'left' | 'right' | 'bothEnds';
+
+interface Color {
+  h: number;
+  s: number;
+  v: number;
+  a: number;
+}

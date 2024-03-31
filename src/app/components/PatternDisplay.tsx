@@ -1,11 +1,9 @@
 import { Dispatch, FunctionComponent, Key, SetStateAction, useEffect } from 'react';
 import styled from 'styled-components';
 import Stitch from './Stitch';
+import { hsvaToHex } from '@uiw/color-convert';
+import { usePatternStore } from '../store';
 
-interface PatternDisplayProps {
-  pattern: Pattern;
-  setPattern: Dispatch<SetStateAction<Pattern>>;
-}
 const StyledPatternDisplay = styled.div`
   padding: 3rem 0;
   min-height: 60%;
@@ -15,22 +13,19 @@ const StyledPatternDisplay = styled.div`
   flex-direction: column;
 `;
 
-const PatternDisplay: FunctionComponent<PatternDisplayProps> = (props) => {
-  const { pattern, setPattern } = props;
+const PatternDisplay: FunctionComponent = (props) => {
+  const { currentColor } = usePatternStore((state) => state);
   return (
     <StyledPatternDisplay>
-      {/* {pattern.rows.map((row: boolean[], index: Key | null | undefined) => (
-        <Row key={index} row={row} />
-      ))} */}
-      <Grid pattern={pattern} setPattern={setPattern} />
+      <Grid />{' '}
+      <div style={{ background: hsvaToHex(currentColor), marginTop: 30, padding: 10 }}>
+        {JSON.stringify(currentColor)}
+      </div>
     </StyledPatternDisplay>
   );
 };
 
-interface GridProps {
-  pattern: Pattern;
-  setPattern: Dispatch<SetStateAction<Pattern>>;
-}
+interface GridProps {}
 const StyledRow = styled.div<{ $index: number }>`
   font-size: 0;
   white-space: nowrap;
@@ -51,10 +46,11 @@ const StyledGrid = styled.div`
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
+  cursor: crosshair;
 `;
 
 export const Grid: FunctionComponent<GridProps> = (props: GridProps) => {
-  const { pattern, setPattern } = props;
+  const { pattern, setPattern } = usePatternStore((state) => state);
 
   function toggleEmptyStitch(rowIndex: number, colIndex: number) {
     const updatedRows = pattern.rows;
@@ -76,9 +72,5 @@ export const Grid: FunctionComponent<GridProps> = (props: GridProps) => {
     </StyledGrid>
   );
 };
-
-interface RowProps {
-  row: boolean[];
-}
 
 export default PatternDisplay;
