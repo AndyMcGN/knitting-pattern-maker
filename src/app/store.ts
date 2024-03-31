@@ -16,12 +16,16 @@ export const usePatternStore = create<AppState>()(
         currentColor: { a: 0, h: 0, s: 0, v: 0 },
         setPattern: (newState) => set(() => ({ pattern: newState })),
         updatePatternWithRow: (newRow: Row) =>
-          set((state) => ({
-            pattern: {
-              ...state.pattern,
-              rows: [...state.pattern.rows, newRow],
-            },
-          })),
+          set((state) => {
+            console.log(state.pattern);
+
+            return {
+              pattern: {
+                ...state.pattern,
+                rows: [...state.pattern.rows, newRow],
+              },
+            };
+          }),
 
         setCurrentColor: (color: Color) => set(() => ({ currentColor: color }), false, 'setCurrentColor'),
       }),

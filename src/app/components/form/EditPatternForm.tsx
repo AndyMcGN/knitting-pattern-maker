@@ -63,6 +63,7 @@ const EditPatternForm: FunctionComponent = () => {
 
   function addCustomRow(numberOfStitches: number) {
     if (numberOfStitches === 0) return;
+    const { currentColor } = usePatternStore.getState();
 
     const lastRow = pattern.rows[pattern.rows?.length - 1] || [];
     // adding identical row
@@ -71,9 +72,11 @@ const EditPatternForm: FunctionComponent = () => {
       updatePatternWithRow(lastRow);
       return;
     }
-
     if (pattern.rows.length === 0) {
-      const initialRow = Array(4).fill(false).concat(Array(numberOfStitches).fill(true)).concat(Array(4).fill(false));
+      const initialRow = Array(4)
+        .fill({ isKnit: false, color: EMPTY_STITCH_COLOR })
+        .concat(Array(numberOfStitches).fill({ isKnit: true, color: currentColor }))
+        .concat(Array(4).fill(false));
       setPattern({ ...pattern, rows: [initialRow] });
       return;
     }
@@ -90,7 +93,6 @@ const EditPatternForm: FunctionComponent = () => {
       oldRowLength: lengthOfNewRow,
     });
     const newRow = Array(newRowLength).fill({ isKnit: false, color: EMPTY_STITCH_COLOR });
-    const { currentColor } = usePatternStore.getState();
     for (let i = newStartColumn; i <= newEndColumn; i++) {
       newRow[i - 1] = { isKnit: true, color: currentColor };
     }
