@@ -1,20 +1,50 @@
 import { FunctionComponent, useState } from 'react';
 import { Box, Select, MenuItem } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import styled from 'styled-components';
 import NumberInput from '../misc/NumberInput';
+import { EMPTY_STITCH_COLOR } from '@/app/constants';
+import { usePatternStore } from '@/app/store';
+import { adjustGridAndIndexesForExtraStitches } from '@/app/EditPatternFunctions';
 
-interface IncreaseOrDecreaseInputContainerProps {
-  addRowWithIncreaseOrDecrease: (options: {
-    increaseOrDecrease: IncreaseOrDecrease;
-    changeAtBeginningOrEnd: StitchChangePlace;
-    numberStitchesToChange: number;
-  }) => void;
+function addRowWithIncreaseOrDecrease(options: {
+  increaseOrDecrease: IncreaseOrDecrease;
+  changeAtBeginningOrEnd: StitchChangePlace;
+  numberStitchesToChange: number;
+}) {
+  const { increaseOrDecrease, changeAtBeginningOrEnd, numberStitchesToChange } = options;
+  let changesLeft = 0;
+  let changesRight = 0;
+  if (changeAtBeginningOrEnd === 'left' || changeAtBeginningOrEnd === 'bothEnds') {
+    changesLeft = increaseOrDecrease === 'increase' ? numberStitchesToChange : -numberStitchesToChange;
+  }
+  if (changeAtBeginningOrEnd === 'right' || changeAtBeginningOrEnd === 'bothEnds') {
+    changesRight = increaseOrDecrease === 'increase' ? numberStitchesToChange : -numberStitchesToChange;
+  }
+  const { pattern, updatePatternWithRow } = usePatternStore.getState();
+  const lastRow = pattern.rows[pattern.rows.length - 1];
+  const firstColumnBeforeChange = lastRow.findIndex((stitch) => stitch.isKnit);
+  const lastColumnBeforeChange = lastRow.findLastIndex((stitch) => stitch.isKnit);
+
+  const newRow = [...lastRow];
+  const firstStitch = firstColumnBeforeChange - changesLeft;
+  const lastColumn = lastColumnBeforeChange + changesRight;
+  // rename all these above to old/something not so similar to the below
+  const { newEndColumn, newRowLength, newStartColumn } = adjustGridAndIndexesForExtraStitches({
+    oldEndColumn: lastColumn,
+    oldRowLength: newRow.length,
+    oldStartColumn: firstStitch,
+  });
+  const currentColor = usePatternStore.getState().currentColor;
+  for (let i = 0; i < newRowLength; i++) {
+    newRow[i] =
+      newStartColumn <= i && i <= newEndColumn
+        ? { color: currentColor, isKnit: true }
+        : { color: EMPTY_STITCH_COLOR, isKnit: false };
+  }
+  updatePatternWithRow(newRow);
 }
-const IncreaseOrDecreaseInputContainer: FunctionComponent<IncreaseOrDecreaseInputContainerProps> = (
-  props: IncreaseOrDecreaseInputContainerProps,
-) => {
-  const { addRowWithIncreaseOrDecrease } = props;
+
+const IncreaseOrDecreaseInputContainer: FunctionComponent = () => {
   const [increaseOrDecrease, setIncreaseOrDecrease] = useState<IncreaseOrDecrease>('increase');
   const [numberStitchesToChange, setNumberStitchesToChange] = useState<number>(1);
   const [changeAtBeginningOrEnd, setChangeAtBeginningOrEnd] = useState<StitchChangePlace>('left');

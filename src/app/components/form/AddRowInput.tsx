@@ -1,15 +1,12 @@
+import { addCustomRow, addIdenticalRow } from '@/app/EditPatternFunctions';
+import { usePatternStore } from '@/app/store';
 import { Button } from '@mui/material';
-import { Dispatch, FunctionComponent, SetStateAction } from 'react';
+import { FunctionComponent, useState } from 'react';
 
-interface AddCustomRowProps {
-  currentNumberOfStitches: number;
-  setCurrentNumberOfStitches: Dispatch<SetStateAction<number>>;
-  addCustomRow: (numberOfStitches: number) => void;
-  pattern: Pattern;
-}
+export const AddCustomRow: FunctionComponent = (props) => {
+  const { pattern } = usePatternStore.getState();
+  const [currentNumberOfStitches, setCurrentNumberOfStitches] = useState<number>(5);
 
-export const AddCustomRow: FunctionComponent<AddCustomRowProps> = (props) => {
-  const { currentNumberOfStitches, addCustomRow, pattern, setCurrentNumberOfStitches } = props;
   return (
     <>
       <p>How many stitches to start with?</p>
@@ -30,12 +27,7 @@ export const AddCustomRow: FunctionComponent<AddCustomRowProps> = (props) => {
   );
 };
 
-interface AddIdenticalRowProps {
-  addIdenticalRow: () => void;
-}
-
-const AddIdenticalRow: FunctionComponent<AddIdenticalRowProps> = (props: AddIdenticalRowProps) => {
-  const { addIdenticalRow } = props;
+const AddIdenticalRow: FunctionComponent = () => {
   return (
     <Button
       variant="contained"

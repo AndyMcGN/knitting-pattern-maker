@@ -1,12 +1,15 @@
 import { FunctionComponent, useState } from 'react';
 import NumberInput from '../misc/NumberInput';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { addIdenticalRow } from '@/app/EditPatternFunctions';
+import { usePatternStore } from '@/app/store';
 
-interface AddRowsUpToNInputProps {
-  addRowsUpToN: (targetRowNumber: number) => void;
+function addRowsUpToN(targetRowNumber: number) {
+  const { pattern } = usePatternStore.getState();
+  const rowsNeeded = targetRowNumber - pattern.rows.length;
+  for (let i = 0; i < rowsNeeded; i++) addIdenticalRow();
 }
-
-const AddRowsUpToNInput: FunctionComponent<AddRowsUpToNInputProps> = ({ addRowsUpToN }) => {
+const AddRowsUpToNInput: FunctionComponent = () => {
   const [targetRows, setTargetRows] = useState(0);
   return (
     <div>

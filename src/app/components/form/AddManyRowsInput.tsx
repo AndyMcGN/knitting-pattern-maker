@@ -1,14 +1,17 @@
-import { Dispatch, SetStateAction, FunctionComponent } from 'react';
+import { addIdenticalRow } from '@/app/EditPatternFunctions';
+import { usePatternStore } from '@/app/store';
+import { FunctionComponent, useState } from 'react';
 
-interface AddManyRowsInputProps {
-  numberOfSameRows: number;
-  setNumberOfSameRows: Dispatch<SetStateAction<number>>;
-  currentNumberOfStitches: number;
-  addManyRows: (numberOfRows: number) => void;
-}
 
-const AddManyRowsInput: FunctionComponent<AddManyRowsInputProps> = (props: AddManyRowsInputProps) => {
-  const { addManyRows, currentNumberOfStitches, numberOfSameRows, setNumberOfSameRows } = props;
+  function addManyRows(numberOfRows: number) {
+    for (let i = 0; i < numberOfRows; i++) {
+      addIdenticalRow();
+    }
+  }
+const AddManyRowsInput: FunctionComponent = () => {
+  const [numberOfSameRows, setNumberOfSameRows] = useState<number>(3);
+  const { pattern } = usePatternStore((state) => state);
+  const currentNumberOfStitches = pattern.rows[pattern.rows.length - 1]?.filter((stitch) => stitch.isKnit).length || 0;
   return (
     <div>
       <span>Create</span>
