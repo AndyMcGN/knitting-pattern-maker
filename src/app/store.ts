@@ -4,7 +4,7 @@ interface AppState {
   pattern: Pattern;
   setPattern: (pattern: Pattern) => void;
   currentColor: Color;
-  updatePatternWithRow: (newRow: boolean[]) => void;
+  updatePatternWithRow: (newRow: Row) => void;
   setCurrentColor: (color: Color) => void;
 }
 
@@ -15,7 +15,7 @@ export const usePatternStore = create<AppState>()(
         pattern: { rows: [] },
         currentColor: { a: 0, h: 0, s: 0, v: 0 },
         setPattern: (newState) => set(() => ({ pattern: newState })),
-        updatePatternWithRow: (newRow: boolean[]) =>
+        updatePatternWithRow: (newRow: Row) =>
           set((state) => ({
             pattern: {
               ...state.pattern,

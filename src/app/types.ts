@@ -1,7 +1,12 @@
 interface Pattern {
-  rows: boolean[][];
+  rows: Row[];
 }
 
+type Row = StitchConfig[];
+interface StitchConfig {
+  color: Color;
+  isKnit: boolean;
+}
 interface GridSize {
   height: number;
   width: number;

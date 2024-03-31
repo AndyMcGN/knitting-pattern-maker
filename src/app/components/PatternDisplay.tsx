@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Stitch from './Stitch';
 import { hsvaToHex } from '@uiw/color-convert';
 import { usePatternStore } from '../store';
+import { EMPTY_STITCH_COLOR } from '../constants';
 
 const StyledPatternDisplay = styled.div`
   padding: 3rem 0;
@@ -50,11 +51,13 @@ const StyledGrid = styled.div`
 `;
 
 export const Grid: FunctionComponent<GridProps> = (props: GridProps) => {
-  const { pattern, setPattern } = usePatternStore((state) => state);
+  const { pattern, setPattern, currentColor } = usePatternStore((state) => state);
 
   function toggleEmptyStitch(rowIndex: number, colIndex: number) {
+    const emptyStitch = { isKnit: false, color: EMPTY_STITCH_COLOR };
+    const knitStitch = { isKnit: true, color: currentColor };
     const updatedRows = pattern.rows;
-    updatedRows[rowIndex][colIndex] = !updatedRows[rowIndex][colIndex];
+    updatedRows[rowIndex][colIndex] = updatedRows[rowIndex][colIndex].isKnit ? emptyStitch : knitStitch;
     setPattern({ ...pattern, rows: updatedRows });
   }
 
@@ -65,7 +68,7 @@ export const Grid: FunctionComponent<GridProps> = (props: GridProps) => {
         pattern.rows.map((row, rowIndex) => (
           <StyledRow key={rowIndex} $index={rowIndex}>
             {row.map((stitch, colIndex) => {
-              return <Stitch isKnit={stitch} key={colIndex} onClick={() => toggleEmptyStitch(rowIndex, colIndex)} />;
+              return <Stitch color={stitch.color} isKnit={stitch.isKnit} key={colIndex} onClick={() => toggleEmptyStitch(rowIndex, colIndex)} />;
             })}
           </StyledRow>
         ))}

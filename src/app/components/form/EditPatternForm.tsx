@@ -1,4 +1,4 @@
-import { Dispatch, FunctionComponent, SetStateAction, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import AddManyRowsInput from './AddManyRowsInput';
 import { AddCustomRow } from './AddRowInput';
 import AddIdenticalRow from './AddRowInput';
@@ -6,6 +6,7 @@ import IncreaseOrDecreaseInputContainer from './IncreaseOrDecreaseInput';
 import { Button } from '@mui/material';
 import AddRowsUpToNInput from './AddRowsUpToNInput';
 import { usePatternStore } from '@/app/store';
+import { EMPTY_STITCH_COLOR } from '@/app/constants';
 
 const EditPatternForm: FunctionComponent = () => {
   const { pattern, setPattern, updatePatternWithRow } = usePatternStore((state) => state);
@@ -38,8 +39,8 @@ const EditPatternForm: FunctionComponent = () => {
     }
 
     const lastRow = pattern.rows[pattern.rows.length - 1];
-    const firstColumnBeforeChange = lastRow.findIndex((val) => val === true);
-    const lastColumnBeforeChange = lastRow.findLastIndex((val) => val === true);
+    const firstColumnBeforeChange = lastRow.findIndex((stitch) => stitch.isKnit);
+    const lastColumnBeforeChange = lastRow.findLastIndex((stitch) => stitch.isKnit);
 
     const newRow = [...lastRow];
     const firstStitch = firstColumnBeforeChange - changesLeft;
@@ -50,8 +51,12 @@ const EditPatternForm: FunctionComponent = () => {
       oldRowLength: newRow.length,
       oldStartColumn: firstStitch,
     });
+    const currentColor = usePatternStore.getState().currentColor;
     for (let i = 0; i < newRowLength; i++) {
-      newRow[i] = newStartColumn <= i && i <= newEndColumn ? true : false;
+      newRow[i] =
+        newStartColumn <= i && i <= newEndColumn
+          ? { color: currentColor, isKnit: true }
+          : { color: EMPTY_STITCH_COLOR, isKnit: false };
     }
     updatePatternWithRow(newRow);
   }
@@ -61,7 +66,7 @@ const EditPatternForm: FunctionComponent = () => {
 
     const lastRow = pattern.rows[pattern.rows?.length - 1] || [];
     // adding identical row
-    if (lastRow && numberOfStitches === lastRow.filter((stitch) => Boolean(stitch)).length) {
+    if (lastRow && numberOfStitches === lastRow.filter((stitch) => stitch.isKnit).length) {
       // this is horrible, should probs save the last noOfStitches
       updatePatternWithRow(lastRow);
       return;
@@ -84,9 +89,10 @@ const EditPatternForm: FunctionComponent = () => {
       oldEndColumn: endColumn,
       oldRowLength: lengthOfNewRow,
     });
-    const newRow = Array(newRowLength).fill(false);
+    const newRow = Array(newRowLength).fill({ isKnit: false, color: EMPTY_STITCH_COLOR });
+    const { currentColor } = usePatternStore.getState();
     for (let i = newStartColumn; i <= newEndColumn; i++) {
-      newRow[i - 1] = true;
+      newRow[i - 1] = { isKnit: true, color: currentColor };
     }
     updatePatternWithRow(newRow);
   }
@@ -124,10 +130,10 @@ const EditPatternForm: FunctionComponent = () => {
     const newRows = pattern.rows.map((row) => {
       let newRow = row.slice();
       for (let i = 0; i < extraStitches.left; i++) {
-        newRow.unshift(false);
+        newRow.unshift({ isKnit: false, color: EMPTY_STITCH_COLOR });
       }
       for (let i = 0; i < extraStitches.right; i++) {
-        newRow.push(false);
+        newRow.push({ isKnit: false, color: EMPTY_STITCH_COLOR });
       }
       return newRow;
     });
